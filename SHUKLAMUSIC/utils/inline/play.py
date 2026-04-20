@@ -70,15 +70,15 @@ def stream_markup_timer(_, chat_id, played, dur):
         ],
         [
             InlineKeyboardButton(
-                text="ᴛᴜηєs",
-                url="http://t.me/TidalXMusicBot/tidaltunes",
+                text="ᴜᴘᴅᴀᴛᴇ",
+                url="https://t.me/+Imyf3M9TO5k1ODRl",
                 icon_custom_emoji_id=5409025823388741707,
                 style=ButtonStyle.PRIMARY
                 
             ),
             InlineKeyboardButton(
                 text="ʜᴏϻє",
-                url="https://t.me/drx_supportchat",
+                url="https://t.me/+dv_rcq5uIXhmMWM1",
                 icon_custom_emoji_id=5409194306365829029,
                 style=ButtonStyle.PRIMARY
             
@@ -100,15 +100,15 @@ def stream_markup(_, chat_id):
         ],
         [
             InlineKeyboardButton(
-                text="ᴛᴜηєs",
-                url="http://t.me/TidalXMusicBot/tidaltunes",
+                text="ᴜᴘᴅᴀᴛᴇ",
+                url="https://t.me/+Imyf3M9TO5k1ODRl",
                  icon_custom_emoji_id=5409025823388741707,
                 style=ButtonStyle.PRIMARY
                 
             ),
             InlineKeyboardButton(
                 text="ʜᴏϻє",
-                url="https://t.me/drx_supportchat",
+                url="https://t.me/+dv_rcq5uIXhmMWM1",
                 icon_custom_emoji_id=5409194306365829029,
                 style=ButtonStyle.PRIMARY
             

@@ -46,8 +46,8 @@ welcome_db = db.welcome_config
 
 YUMI_PICS = [
 "https://files.catbox.moe/5go4t6.jpg",
-"https://files.catbox.moe/zp7b9k.jpg",
-"https://files.catbox.moe/qd4pv8.jpg",  
+"https://files.catbox.moe/vbdda6.jpg",
+"https://files.catbox.moe/l2id2z.jpg",  
 
 ]
 
@@ -140,11 +140,11 @@ async def start_pm(client, message: Message, _):
     await asyncio.sleep(0.1)
     await loading_1.edit_text("<b>ᴅɪηɢ ᴅᴏηɢ...❤️‍🔥</b>")
     await asyncio.sleep(0.1)
-    await loading_1.edit_text("<b>ᴛιᴅᴀʟ</b>")
+    await loading_1.edit_text("<b>ʀᴀᴅʜᴀ</b>")
     await asyncio.sleep(0.1)
-    await loading_1.edit_text("<b>ᴛιᴅᴀʟ ꭙ</b>")
+    await loading_1.edit_text("<b>ʀᴀᴅʜᴀ ꭙ</b>")
     await asyncio.sleep(0.1)
-    await loading_1.edit_text("<b>ᴛιᴅᴀʟ ꭙ ϻᴜsɪᴄ ♪</b>")
+    await loading_1.edit_text("<b>ʀᴀᴅʜᴀ ꭙ ϻᴜsɪᴄ ♪</b>")
     await asyncio.sleep(0.1)
     await loading_1.edit_text("<b>sᴛᴧʀᴛed!🥀</b>")
     await asyncio.sleep(0.1)

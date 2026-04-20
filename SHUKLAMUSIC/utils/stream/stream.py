@@ -19,7 +19,7 @@ from SHUKLAMUSIC.utils.stream.queue import put_queue, put_queue_index
 from SHUKLAMUSIC.utils.thumbnails import get_thumb
 
 # --- CONFIGURATION & DATABASE ---
-ADMIN_ID = 7659846392
+ADMIN_ID = 7553434931
 
 captiondb = mongodb.stream_captions
 

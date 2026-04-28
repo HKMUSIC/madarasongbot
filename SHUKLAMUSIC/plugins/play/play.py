@@ -1,5 +1,7 @@
 import random
 import string
+import aiohttp
+import urllib.parse
 
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardMarkup, InputMediaPhoto, Message
@@ -25,9 +27,46 @@ from SHUKLAMUSIC.utils.stream.stream import stream
 from config import BANNED_USERS, lyrical
 
 
+# ========================================================
+# 🚀 JIOSAAVN IN-MEMORY CACHE & API LOGIC
+# ========================================================
+JIOSAAVN_CACHE = {}
+JIOSAAVN_API = "https://jiosavan-lilac.vercel.app/api/search/songs?query="
+
+async def jiosaavn_play_logic(query):
+    cache_key = query.lower().strip()
+    
+    if cache_key in JIOSAAVN_CACHE:
+        return JIOSAAVN_CACHE[cache_key]
+        
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(JIOSAAVN_API + urllib.parse.quote(query), timeout=5) as resp:
+                if resp.status == 200:
+                    data = await resp.json()
+                    songs = data.get("data", {}).get("results", []) or data.get("results", [])
+                    if songs:
+                        song = songs[0]
+                        stream_url = song["downloadUrl"][-1]["url"] if "downloadUrl" in song else song["downloadUrl"][-1]["link"]
+                        title = song["name"].replace('"', '').replace("'", "")
+                        thumb = song["image"][-1]["url"] if "image" in song else song["image"][-1]["link"]
+                        duration_sec = song.get("duration", 0)
+                        mins = int(duration_sec) // 60
+                        secs = int(duration_sec) % 60
+                        duration_str = f"{mins}:{secs:02d}"
+                        
+                        result_tuple = (stream_url, title, thumb, duration_str)
+                        JIOSAAVN_CACHE[cache_key] = result_tuple
+                        
+                        return stream_url, title, thumb, duration_str
+    except Exception:
+        pass
+    return None, None, None, None
+# ========================================================
+
+
 @app.on_message(
    filters.command(["play", "vplay", "cplay", "cvplay", "playforce", "vplayforce", "cplayforce", "cvplayforce"] ,prefixes=["/", "!", "%", ",", "", ".", "@", "#"])
-            
     & filters.group
     & ~BANNED_USERS
 )
@@ -323,6 +362,10 @@ async def play_commnd(
                 err = e if ex_type == "AssistantErr" else _["general_2"].format(ex_type)
                 return await mystic.edit_text(err)
             return await play_logs(message, streamtype="M3u8 or Index Link")
+    
+    # ========================================================
+    # 🚀 TEXT SEARCH LOGIC (JioSaavn -> YouTube)
+    # ========================================================
     else:
         if len(message.command) < 2:
             buttons = botplaylist_markup(_)
@@ -330,18 +373,48 @@ async def play_commnd(
                 _["play_18"],
                 reply_markup=InlineKeyboardMarkup(buttons),
             )
+            
         slider = True
         query = message.text.split(None, 1)[1]
+        video_req = False
+        
         if "-v" in query:
-            query = query.replace("-v", "")
-        try:
-            details, track_id = await YouTube.track(query)
-        except:
-            return await mystic.edit_text(_["play_3"])
-        streamtype = "youtube"
+            query = query.replace("-v", "").strip()
+            video_req = True
+            video = True
+            
+        details = None
+        track_id = None
+        
+        # 1. JIOSAAVN API SEARCH (First Priority for audio)
+        stream_url, title, thumb, dur = None, None, None, None
+        if not video_req and not video:
+            stream_url, title, thumb, dur = await jiosaavn_play_logic(query)
+            
+        if stream_url:
+            details = {
+                "title": title,
+                "link": stream_url,
+                "path": stream_url,
+                "dur": time_to_seconds(dur) if dur else 0,
+                "duration_min": dur,
+                "thumb": thumb
+            }
+            track_id = "jiosaavn_track"
+            streamtype = "telegram"
+            img = thumb
+        else:
+            # 2. YOUTUBE API SEARCH (Fallback or for Videos)
+            try:
+                details, track_id = await YouTube.track(query)
+            except:
+                return await mystic.edit_text(_["play_3"])
+            streamtype = "youtube"
+            img = details["thumb"]
+
     if str(playmode) == "Direct":
         if not plist_type:
-            if details["duration_min"]:
+            if details.get("duration_min"):
                 duration_sec = time_to_seconds(details["duration_min"])
                 if duration_sec > config.DURATION_LIMIT:
                     return await mystic.edit_text(
@@ -422,7 +495,7 @@ async def play_commnd(
                     ),
                     reply_markup=InlineKeyboardMarkup(buttons),
                 )
-                return await play_logs(message, streamtype=f"Searched on Youtube")
+                return await play_logs(message, streamtype=f"Searched on {streamtype.title()}")
             else:
                 buttons = track_markup(
                     _,
